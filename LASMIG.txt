@@ -1,0 +1,68 @@
+RENEW LAB OS — TESTKÖRNING (utkast v0.3)
+=========================================
+
+Filer på stickan
+----------------
+  renewlab-os-setup.sh   Installationsskriptet
+  renewlab-splash.png    Logga till startskärmen (420 x 112 px)
+  LASMIG.txt             Den här filen
+
+
+1. Installera Debian 13
+-----------------------
+  - Ladda ner netinst-avbilden för amd64 från debian.org.
+  - Root-lösenord: LÄMNA TOMT. Då installeras sudo och ditt konto
+    får adminrättigheter (skriptet kräver sudo).
+  - Skapa ett tillfälligt konto, t.ex. "prep".
+  - Programval: kryssa i "Xfce" och "standard system utilities".
+  - Datorn måste vara uppkopplad mot internet när skriptet körs.
+
+
+2. Kör skriptet
+---------------
+  Kopiera filerna till hemmappen först (FAT32/exFAT-stickor kan
+  oftast inte köra skript direkt). Öppna en terminal:
+
+    cp /media/$USER/*/renewlab-os-setup.sh /media/$USER/*/renewlab-splash.png ~
+    cd ~
+    chmod +x renewlab-os-setup.sh
+    sudo ./renewlab-os-setup.sh --logo renewlab-splash.png --age primary
+
+  Tillval:
+    --age preschool|primary|secondary   Åldersgrupp (standard: primary)
+    --lowspec                           Svag dator: zram + inga effekter
+    --dns-filter family|cloudflare|off  Familjefilter (standard: family)
+    --disable-panel eDP-1               Trasig inbyggd skärm
+
+
+3. Starta om och testa
+----------------------
+  [ ] Startskärmen syns (både inbyggd och extern skärm om båda finns)
+  [ ] Firefox: about:policies visar policyerna som aktiva
+  [ ] roblox.com går inte att öppna
+  [ ] Terminal: getent hosts www.roblox.com  ->  0.0.0.0
+  [ ] Terminal: sudo renewlab-safety status  ->  visar filterservrar
+  [ ] En vuxensajt blockeras, Google/YouTube kör SafeSearch/Begränsat läge
+  [ ] Firefox: uBlock Origin finns, privat fönster saknas
+  [ ] Menyn: "Mörkt tema / Dark theme" fungerar (testa i ett NYTT konto)
+  [ ] timekpr-nExT öppnas, apparna för åldersgruppen finns
+
+  Kolla loggen efter paket som inte hittades:
+    grep MISSING /var/log/renewlab-os-setup.log
+
+
+4. (Valfritt) Testa köparens första start
+-----------------------------------------
+  OBS: raderar ditt prep-konto vid nästa start. Gör det bara på en
+  testmaskin där det inte gör något.
+
+    sudo ./renewlab-os-setup.sh --arm-firstboot prep
+
+  Stäng av. Vid nästa start kommer guiden som skapar vuxen- och
+  barnkonto. Efter omstarten tas prep-kontot och guidekontot bort.
+
+
+Om något går fel
+----------------
+  Skicka den röda [x]-raden och slutet av loggen:
+    tail -50 /var/log/renewlab-os-setup.log
